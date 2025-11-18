@@ -2,11 +2,7 @@ import SwiftUI
 import StoreKit
 
 struct SettingsView: View {
-    // --- YENİ EKLENEN SATIR ---
-    // Ana PomodoroViewModel'e erişmek için
     @EnvironmentObject var pomodoroViewModel: PomodoroViewModel
-    // --- BİTTİ ---
-    
     @EnvironmentObject var themeManager: ThemeManager
     @Environment(\.requestReview) var requestReview
 
@@ -16,12 +12,9 @@ struct SettingsView: View {
     @State private var selectedSound: SoundOption
     @State private var autoStartSessions: Bool
     @State private var selectedAppearance: AppearanceMode
-    @State private var enableFocusModeOnTimerStart: Bool
     @State private var showResetAlert = false
      
     init() {
-        // Not: Bu init() metodu, @State'leri yüklemek için
-        // EnvironmentObject'tan ÖNCE çalışır. Bu normaldir.
         let settings = SettingsManager.load()
         _workDuration = State(initialValue: settings.workDuration)
         _shortBreakDuration = State(initialValue: settings.shortBreakDuration)
@@ -29,7 +22,6 @@ struct SettingsView: View {
         _selectedSound = State(initialValue: settings.selectedSound)
         _autoStartSessions = State(initialValue: settings.autoStartSessions)
         _selectedAppearance = State(initialValue: settings.appearanceMode)
-        _enableFocusModeOnTimerStart = State(initialValue: settings.enableFocusModeOnTimerStart)
     }
      
     var body: some View {
@@ -37,13 +29,7 @@ struct SettingsView: View {
             pomodoroSettingsSection
             soundSettingsSection
             appearanceSettingsSection
-            
-            if #available(iOS 15.0, *) {
-                focusModeSection
-            }
-            
             communitySection
-            
             resetSection
         }
         .scrollContentBackground(.hidden)
@@ -67,16 +53,10 @@ struct SettingsView: View {
             longBreakDuration: longBreakDuration,
             selectedSound: selectedSound,
             autoStartSessions: autoStartSessions,
-            appearanceMode: selectedAppearance,
-            enableFocusModeOnTimerStart: enableFocusModeOnTimerStart
+            appearanceMode: selectedAppearance
         )
         SettingsManager.save(settings: newSettings)
-        
-        // --- YENİ EKLENEN SATIR ---
-        // Ayarları kaydettikten sonra, ana ViewModel'i GÜNCELLE
-        // Bu, PomodoroViewModel'deki applySettings() fonksiyonunu tetikler.
         pomodoroViewModel.applySettings()
-        // --- BİTTİ ---
     }
 }
 
@@ -94,8 +74,6 @@ private extension SettingsView {
                         .foregroundColor(.secondary)
                 }
             }
-            // DÜZELTME: (iOS 17+) .onChange(of: workDuration, saveSettingsOnChange)
-            // Bu şekilde daha temiz, ancak mevcut kodunuz da doğru çalışır
             .onChange(of: workDuration) { _, _ in saveSettingsOnChange() }
             
             Stepper(value: $shortBreakDuration, in: 1...30) {
@@ -122,18 +100,6 @@ private extension SettingsView {
             
             Toggle("settings_autostart", isOn: $autoStartSessions)
                 .onChange(of: autoStartSessions) { _, _ in saveSettingsOnChange() }
-            
-            if #available(iOS 16.0, *) {
-                Toggle("Enable Focus Mode on Timer Start", isOn: $enableFocusModeOnTimerStart)
-                    .onChange(of: enableFocusModeOnTimerStart) { _, _ in saveSettingsOnChange() }
-                
-                if enableFocusModeOnTimerStart {
-                    Text("Note: To automatically activate Focus Mode, create a Shortcuts automation that triggers when Clarity timer starts.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.top, 4)
-                }
-            }
         }
         .listRowBackground(themeManager.currentTheme.inactiveColor.opacity(0.5))
     }
@@ -147,7 +113,7 @@ private extension SettingsView {
             }
             .onChange(of: selectedSound) { _, newSound in
                 SoundPlayer.playSound(named: newSound.rawValue)
-                saveSettingsOnChange() // Anında kaydet
+                saveSettingsOnChange()
             }
         }
         .listRowBackground(themeManager.currentTheme.inactiveColor.opacity(0.5))
@@ -167,7 +133,7 @@ private extension SettingsView {
             .pickerStyle(.menu)
             .onChange(of: selectedAppearance) { _, newMode in
                 AppearanceManager.applyAppearanceMode(newMode)
-                saveSettingsOnChange() // Anında kaydet
+                saveSettingsOnChange()
             }
             
             Picker("settings_theme", selection: $themeManager.currentTheme) {
@@ -176,28 +142,12 @@ private extension SettingsView {
                 }
             }
             .pickerStyle(.menu)
-            // Not: Tema değişikliği ThemeManager tarafından otomatik kaydedilir
-            // ve 'saveSettingsOnChange' çağırmaz, ki bu doğru.
-        }
-        .listRowBackground(themeManager.currentTheme.inactiveColor.opacity(0.5))
-    }
-    
-    @available(iOS 15.0, *)
-    var focusModeSection: some View {
-        Section(header: Text("Focus Mode").foregroundColor(.secondary)) {
-            Toggle("Enable Focus Mode Integration", isOn: .constant(false))
-                .disabled(true)
-            
-            Text("Focus Mode integration allows Clarity to automatically start timers when specific Focus Modes are activated.")
-                .font(.caption)
-                .foregroundColor(.secondary)
         }
         .listRowBackground(themeManager.currentTheme.inactiveColor.opacity(0.5))
     }
      
     var communitySection: some View {
         Section(header: Text("settings_support").foregroundColor(themeManager.currentTheme.primaryTextColor.opacity(0.6))) {
-            // Feedback & Support (Mail)
             Button {
                 let subject = "Clarity Feedback"
                 let body = "Merhaba,\n\nGeri bildirimim: "
@@ -211,7 +161,6 @@ private extension SettingsView {
                     .foregroundStyle(themeManager.currentTheme.primaryTextColor)
             }
 
-            // Uygulamayı Puanla (App Store)
             Button {
                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
                     SKStoreReviewController.requestReview(in: windowScene)
@@ -223,7 +172,6 @@ private extension SettingsView {
                     .foregroundStyle(themeManager.currentTheme.primaryTextColor)
             }
 
-            // Tavsiye Et (Paylaş)
             if let shareURL = URL(string: "https://apps.apple.com/app/id6754528820") {
                 ShareLink(item: shareURL, subject: Text("settings_share_subject"), message: Text("settings_share_message")) {
                     Label("settings_recommend", systemImage: "square.and.arrow.up")

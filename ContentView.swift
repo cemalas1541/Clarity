@@ -33,7 +33,6 @@ struct ContentView: View {
                             Task { await viewModel.handleToggle() }
                         },
                         onReset: {
-                            // DÜZELTME 1: (BUTON GİZLEME MANTIĞI)
                             if viewModel.isActive {
                                 viewModel.isShowingResetAlert = true
                             }
@@ -61,36 +60,21 @@ struct ContentView: View {
             NotificationManager.requestAuthorization()
             viewModel.themeManager = themeManager
             checkIntent()
-            
-            // Focus Mode entegrasyonunu başlat
-            if #available(iOS 15.0, *) {
-                setupFocusModeIntegration()
-            }
         }
         .onChange(of: scenePhase) { _, newPhase in
             handleScene(newPhase)
         }
-        
-        // DÜZELTME 2: (%d HATASI İÇİN)
         .alert("alert_skip_title", isPresented: $viewModel.isShowingSkipAlert) {
             Button("cancel", role: .cancel) {}
             Button("skip") {
                 Task { await viewModel.handleSkip() }
             }
         } message: {
-            // 1. Lokalize format metnini alın
-            let formatString = NSLocalizedString("alert_skip_message", comment: "Alert message for skipping")
-            
-            // 2. ViewModel'den sayıyı alın
+            let formatString = NSLocalizedString("alert_skip_message", comment: "")
             let minutes = viewModel.minutesSpent
-            
-            // 3. Nihai metni oluşturun
             let message = String(format: formatString, minutes)
-            
-            // 4. Formatlanmış metni gösterin
             Text(message)
         }
-        
         .alert("alert_reset_title", isPresented: $viewModel.isShowingResetAlert) {
             Button("cancel", role: .cancel) {}
             Button("alert_reset_confirm", role: .destructive) {
@@ -125,29 +109,10 @@ struct ContentView: View {
         case .active:
             checkIntent()
             viewModel.sync()
-            
         case .background:
-            // Arka plan optimizasyonu: Timer devam eder
             break
-            
         default:
             break
-        }
-    }
-    
-    // MARK: - Focus Mode Integration
-    @available(iOS 15.0, *)
-    private func setupFocusModeIntegration() {
-        // Focus Mode değişikliklerini dinle
-        NotificationCenter.default.addObserver(
-            forName: NSNotification.Name("FocusModeChanged"),
-            object: nil,
-            queue: .main
-        ) { notification in
-            if let focusMode = notification.userInfo?["focusMode"] as? String,
-               let isActive = notification.userInfo?["isActive"] as? Bool {
-                FocusModeManager.shared.handleFocusModeChange(focusMode, isActive: isActive)
-            }
         }
     }
 }

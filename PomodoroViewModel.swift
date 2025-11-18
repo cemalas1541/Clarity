@@ -1,10 +1,10 @@
 import Foundation
 import SwiftUI
 import Combine
+import ActivityKit // Önemli
 
 @MainActor
 class PomodoroViewModel: ObservableObject {
-    
     
     // MARK: - Published
     @Published var timeRemaining: Int = 0
@@ -20,6 +20,9 @@ class PomodoroViewModel: ObservableObject {
     // MARK: - Private
     private var timer: Timer?
     private var endDate: Date?
+    // Live Activity referansı
+    private var currentActivity: Activity<ClarityActivityAttributes>?
+    
     weak var themeManager: ThemeManager?
     
     var minutesSpent: Int {
@@ -28,7 +31,6 @@ class PomodoroViewModel: ObservableObject {
     
     // MARK: - Init
     init() {
-        // Performans: Settings'i lazy yükle
         let settings = SettingsManager.load()
         _currentSettings = Published(initialValue: settings)
         
@@ -36,18 +38,17 @@ class PomodoroViewModel: ObservableObject {
         _timeRemaining = Published(initialValue: duration)
         _sessionTotalDuration = Published(initialValue: duration)
         
-        // Haptic feedback jeneratörlerini önceden hazırla
         prepareHaptics()
     }
     
     private func prepareHaptics() {
-        // Haptic feedback gecikmesini azaltmak için jeneratörleri hazırla
         _ = UIImpactFeedbackGenerator(style: .medium)
         _ = UINotificationFeedbackGenerator()
     }
     
     deinit {
         timer?.invalidate()
+        // ViewModel ölürse aktiviteyi de sonlandırabiliriz, ama genelde app lifecycle yönetir.
     }
     
     // MARK: - Actions
@@ -79,12 +80,8 @@ class PomodoroViewModel: ObservableObject {
             durationInSeconds: timeRemaining
         )
         
-        // Focus Mode entegrasyonu: Timer başladığında Focus Mode'u aç
-        if currentSettings.enableFocusModeOnTimerStart {
-            if #available(iOS 16.0, *) {
-                FocusModeManager.shared.activateFocusModeOnTimerStart()
-            }
-        }
+        // Live Activity Başlat
+        startLiveActivity()
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             self?.tick()
@@ -103,12 +100,8 @@ class PomodoroViewModel: ObservableObject {
         
         NotificationManager.cancelNotifications()
         
-        // Focus Mode entegrasyonu: Timer durduğunda Focus Mode'u kapat
-        if currentSettings.enableFocusModeOnTimerStart {
-            if #available(iOS 16.0, *) {
-                FocusModeManager.shared.deactivateFocusModeOnTimerStop()
-            }
-        }
+        // Live Activity Bitir
+        endLiveActivity()
     }
     
     private func reset() {
@@ -119,12 +112,8 @@ class PomodoroViewModel: ObservableObject {
         
         NotificationManager.cancelNotifications()
         
-        // Focus Mode entegrasyonu: Timer sıfırlandığında Focus Mode'u kapat
-        if currentSettings.enableFocusModeOnTimerStart {
-            if #available(iOS 16.0, *) {
-                FocusModeManager.shared.deactivateFocusModeOnTimerStop()
-            }
-        }
+        // Live Activity Bitir
+        endLiveActivity()
         
         pomodoroState = .working
         completedPomodoros = 0
@@ -162,6 +151,9 @@ class PomodoroViewModel: ObservableObject {
             isActive = false
             endDate = nil
             
+            // Live Activity Bitir (Süre doldu)
+            endLiveActivity()
+            
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 self?.complete()
             }
@@ -177,7 +169,9 @@ class PomodoroViewModel: ObservableObject {
         if timeRemaining <= 0 {
             complete()
         } else {
-            start()
+            // Uygulama tekrar aktif olduğunda timer'ı yeniden başlatmaya gerek yok
+            // çünkü tick() zaten çalışıyor, ancak UI'ı güncellemek iyidir.
+            // Live Activity zaten arka planda çalışıyor.
         }
     }
     
@@ -226,6 +220,52 @@ class PomodoroViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Live Activity Management
+    private func startLiveActivity() {
+        // Eğer zaten bir aktivite varsa ve çalışıyorsa, yenisini başlatma
+        if let activity = currentActivity, activity.activityState == .active {
+            return
+        }
+        
+        // Eski aktiviteleri temizle (opsiyonel ama temizlik için iyi)
+        Task {
+            for activity in Activity<ClarityActivityAttributes>.activities {
+                await activity.end(nil, dismissalPolicy: .immediate)
+            }
+        }
+        
+        guard let endDate = endDate else { return }
+        
+        let attributes = ClarityActivityAttributes(sessionName: "Clarity Session")
+        
+        let contentState = ClarityActivityAttributes.ContentState(
+            estimatedEndDate: endDate,
+            totalDuration: Double(sessionTotalDuration),
+            stateName: pomodoroState.displayNameKey
+        )
+        
+        do {
+            let activity = try Activity<ClarityActivityAttributes>.request(
+                attributes: attributes,
+                content: .init(state: contentState, staleDate: nil),
+                pushType: nil
+            )
+            currentActivity = activity
+        } catch {
+            print("Error starting Live Activity: \(error.localizedDescription)")
+        }
+    }
+    
+    private func endLiveActivity() {
+        Task {
+            // Tüm aktiviteleri bitir
+            for activity in Activity<ClarityActivityAttributes>.activities {
+                await activity.end(nil, dismissalPolicy: .immediate)
+            }
+            currentActivity = nil
+        }
+    }
+    
     // MARK: - Helpers
     private func formatTime(_ seconds: Int) -> String {
         let m = seconds / 60
@@ -248,12 +288,21 @@ class PomodoroViewModel: ObservableObject {
     }
 }
 
+// MARK: - Pomodoro State Extensions
 extension PomodoroState {
     var stateString: String {
         switch self {
         case .working: return "work"
         case .shortBreak: return "shortBreak"
         case .longBreak: return "longBreak"
+        }
+    }
+    
+    var displayNameKey: String {
+        switch self {
+        case .working: return "Odaklanma"
+        case .shortBreak: return "Kısa Mola"
+        case .longBreak: return "Uzun Mola"
         }
     }
 }

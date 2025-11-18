@@ -47,7 +47,7 @@ enum SoundOption: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-// YENİ: Appearance Mode
+// Görünüm Modu
 enum AppearanceMode: String, CaseIterable, Identifiable, Codable {
     case light = "appearance_light"
     case dark = "appearance_dark"
@@ -60,15 +60,14 @@ enum AppearanceMode: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-// Ayarlar Modeli
+// Ayarlar Modeli (Focus Mode kaldırıldı)
 struct PomodoroSettings: Codable {
     var workDuration: Int = 25
     var shortBreakDuration: Int = 5
     var longBreakDuration: Int = 15
     var selectedSound: SoundOption = .digital
     var autoStartSessions: Bool = false
-    var appearanceMode: AppearanceMode = .system  // YENİ EKLEME
-    var enableFocusModeOnTimerStart: Bool = false  // Timer başladığında Focus Mode aç
+    var appearanceMode: AppearanceMode = .system
 }
 
 // Yardımcı Uzantı
