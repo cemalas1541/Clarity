@@ -1,0 +1,109 @@
+
+/* Clarity - Türkçe Çeviriler
+*/
+
+// MARK: - Genel UI
+"tab_focus" = "Odak";
+"tab_stats" = "İstatistikler";
+"tab_settings" = "Ayarlar";
+"done" = "Bitti";
+"cancel" = "İptal";
+
+// MARK: - Zamanlayıcı Durumları
+"state_working" = "Odak";
+"state_short_break" = "Kısa Mola";
+"state_long_break" = "Uzun Mola";
+
+// MARK: - Ayarlar Ekranı
+"settings_title" = "Ayarlar";
+"settings_pomodoro_times" = "Pomodoro Süreleri";
+"settings_work" = "Çalışma";
+"settings_short_break" = "Kısa Mola";
+"settings_long_break" = "Uzun Mola";
+"settings_sound_options" = "Ses Ayarları";
+"settings_session_end_sound" = "Seans Bitiş Sesi";
+"settings_appearance" = "Görünüm";
+"settings_theme" = "Tema";
+"settings_reset_stats" = "Tüm İstatistikleri Sıfırla";
+
+// MARK: - İstatistikler Ekranı
+"stats_title" = "İstatistikler";
+"stats_timeframe_picker_label" = "Zaman Aralığı"; // EKLENDİ
+"timeframe_daily" = "Günlük";
+"timeframe_weekly" = "Haftalık";
+"timeframe_monthly" = "Aylık";
+"timeframe_yearly" = "Yıllık";
+"summary_total_time" = "Toplam Süre";
+"summary_most_productive" = "En Verimli";
+"chart_summary" = "Özet";
+"chart_no_data" = "Bu periyotta veri yok.";
+"general_total" = "Genel Toplam";
+"minutes_short" = "dk";
+"time_axis_label" = "Zaman";
+"minutes_axis_label" = "Dakika";
+
+// MARK: - Uyarılar
+"alert_skip_title" = "Seansı Erken Bitir?";
+"alert_skip_message" = "Bu seans tamamlanmış bir Pomodoro olarak sayılmayacak. Yine de odaklandığınız %d dakika istatistiklerinize eklenecektir.";
+"alert_skip_confirm" = "Bitir";
+"alert_reset_title" = "Zamanlayıcıyı Sıfırla?";
+"alert_reset_message" = "Bu, mevcut seansı durduracak ve bu döngü için tamamlanmış pomodoro sayınızı sıfırlayacak.";
+"alert_reset_confirm" = "Sıfırla";
+
+// MARK: - Bildirimler
+"notification_permission_granted" = "Bildirim izni alındı.";
+"notification_timer_up_title" = "Süre Doldu!";
+"notification_work_session_body" = "Çalışma seansı bitti. Şimdi mola zamanı.";
+"notification_break_over_title" = "Mola Bitti!";
+"notification_new_session_body" = "Haydi, yeni bir seansa başlama zamanı.";
+
+// MARK: - Onboarding
+"onboarding_title_1" = "Akışla Odaklan";
+"onboarding_desc_1" = "Çalışmalarını, kısa molalarla ayrılmış yönetilebilir aralıklara bölmek için Pomodoro Tekniği'ni kullan.";
+"onboarding_title_2" = "İlerlemeni Takip Et";
+"onboarding_desc_2" = "Motive kalmak için günlük, haftalık ve aylık odaklanma seanslarını istatistik panelinde incele.";
+"onboarding_title_3" = "Alanını Özelleştir";
+"onboarding_desc_3" = "Mükemmel odaklanma ortamını yaratmak için çeşitli temalar ve sesler arasından seçim yap.";
+"onboarding_start_button" = "Başla";
+
+// MARK: - Ses İsimleri (EKSİK OLANLAR EKLENDİ)
+"sound_digital" = "Dijital";
+"sound_bell" = "Çan Sesi";
+"sound_chime" = "Melodi";
+
+// MARK: - Tema İsimleri (EKSİK OLANLAR EKLENDİ)
+"theme_mint_green" = "Nane Yeşili";
+"theme_lavender" = "Lavanta";
+"theme_sunset" = "Gün Batımı";
+"theme_forest" = "Orman";
+"theme_ocean_breeze" = "Okyanus Esintisi";
+"settings_autostart" = "Seansları Otomatik Başlat";
+"summary_streak" = "Seri";
+"summary_daily_average" = "Günlük Ort.";
+"summary_best_hour" = "En İyi Saat";
+"summary_best_day" = "En İyi Gün";
+"summary_best_date" = "En İyi Tarih";
+"summary_best_month" = "En İyi Ay";
+"ready_to_start" = "Odaklanmaya Hazır Mısın?";
+"start_first_session" = "İlk seansını başlat! 🎯";
+"alert_reset_stats_title" = "İstatistikleri Sıfırla?";
+"alert_reset_stats_message" = "Tüm tamamlanmış seansların kalıcı olarak silinecek. Bu işlem geri alınamaz.";
+"alert_reset_stats_confirm" = "Hepsini Sıfırla";
+"settings_appearance_mode" = "Görünüm";
+"appearance_light" = "Açık";
+"appearance_dark" = "Koyu";
+"appearance_system" = "Sistem";
+"summary_total_sessions" = "Toplam Oturum";
+"skip" = "Atla";
+"next" = "İleri";
+"previous" = "Geri";
+
+/* Ayarlar - Destek bölümü */
+"settings_support" = "Geri Bildirim & Destek";
+"settings_feedback_support" = "Geri Bildirim & Destek";
+"settings_rate_app" = "Uygulamayı Puanla";
+"settings_recommend" = "Arkadaşına Tavsiye Et";
+
+/* Paylaşım içeriği */
+"settings_share_subject" = "Clarity – Odak & Pomodoro'yu mutlaka dene";
+"settings_share_message" = "Odaklanmak için Clarity kullanıyorum. App Store’dan indir:";

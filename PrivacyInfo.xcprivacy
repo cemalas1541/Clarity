@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Kullanılan Apple API'leri -->
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <dict>
+            <!-- UserDefaults kullanımı -->
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <!-- CA92.1: Kullanıcının app içi tercihlerini saklamak için -->
+                <string>CA92.1</string>
+            </array>
+        </dict>
+    </array>
+    
+    <!-- Tracking yapıyor muyuz? HAYIR -->
+    <key>NSPrivacyTracking</key>
+    <false/>
+    
+    <!-- Tracking domain'leri (boş) -->
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+    
+    <!-- Toplanan veri tipleri (boş - hiç veri toplama yok) -->
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array/>
+</dict>
+</plist>
